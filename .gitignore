@@ -1,4 +1,6 @@
 conf.js
+.env
+package-lock.json
 
 # node
 node_modules/
