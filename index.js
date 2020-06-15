@@ -35,10 +35,10 @@ app.get("/api/cities/names", (req, res) => {
 });
 
 // GET with filter 1
-app.get("/api/cities/search", (req, res) => {
+app.get("/api/cities/contain", (req, res) => {
   const name = req.query.name;
   connection.query(
-    "SELECT name from city WHERE name LIKE ? ",
+    `SELECT * from city WHERE name LIKE CONCAT("%"?"%") `,
     [name],
     (err, results) => {
       if (err) {
@@ -52,34 +52,44 @@ app.get("/api/cities/search", (req, res) => {
 });
 
 // GET with filter 2 begin by ?%
-app.get("/api/cities/names", (req, res) => {
-  connection.query("SELECT name from city", (err, results) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send("Erreur lors de la récupération des données");
-    } else {
-      res.json(results);
+app.get("/api/cities/begin", (req, res) => {
+  const name = req.query.name;
+  connection.query(
+    `SELECT * FROM city WHERE name LIKE CONCAT(?"%")`,
+    [name],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send("Erreur lors de la récupération des données");
+      } else {
+        res.json(results);
+      }
     }
-  });
+  );
 });
 
 // GET with filter 3 greater than
-app.get("/api/cities/names", (req, res) => {
-  connection.query("SELECT name from city", (err, results) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send("Erreur lors de la récupération des données");
-    } else {
-      res.json(results);
+app.get("/api/cities/greater", (req, res) => {
+  const date = req.query.date;
+  connection.query(
+    `SELECT * FROM city WHERE date > ?`,
+    [date],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send("Erreur lors de la récupération des données");
+      } else {
+        res.json(results);
+      }
     }
-  });
+  );
 });
 
 // GET sort
 app.get("/api/cities/:sort", (req, res) => {
   const sort = req.params.sort;
   connection.query(
-    "SELECT name from city ORDER BY name ? ",
+    `SELECT * from city ORDER BY name ? `,
     [sort],
     (err, results) => {
       if (err) {
@@ -106,7 +116,7 @@ app.post("/api/cities", (req, res) => {
 });
 
 // PUT
-app.put("/api/cities/:id", (req, res) => {
+app.put("/api/cities/update/:id", (req, res) => {
   const idCity = req.params.id;
   const formData = req.body;
   connection.query(
@@ -124,6 +134,16 @@ app.put("/api/cities/:id", (req, res) => {
 });
 
 // PUT toggle boolean
+app.put("/api/cities/toggle", (req, res) => {
+  connection.query("UPDATE city SET visited = IF (visited, 0, 1)", (err) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Erreur lors de la modification d'une ville");
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
 
 // DELETE
 app.delete("/api/cities/names/:id", (req, res) => {
@@ -140,7 +160,6 @@ app.delete("/api/cities/names/:id", (req, res) => {
 
 //DELETE only false
 app.delete("/api/cities/non-visited", (req, res) => {
-  const nonVisited = req.params.false;
   connection.query(
     "DELETE FROM city WHERE visited = 0",
     [nonVisited],
