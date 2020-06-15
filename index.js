@@ -89,7 +89,7 @@ app.get("/api/cities/greater", (req, res) => {
 app.get("/api/cities/:sort", (req, res) => {
   const sort = req.params.sort;
   connection.query(
-    `SELECT * from city ORDER BY name ? `,
+    `SELECT * from city ORDER BY name ${sort === "asc" ? "ASC" : "DESC"}`,
     [sort],
     (err, results) => {
       if (err) {
