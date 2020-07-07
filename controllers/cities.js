@@ -1,41 +1,33 @@
 const { connection } = require("../conf");
 
-const getCities = (req, res) => {
-  let sqlRequest = `SELECT name, description, department, visited, date FROM city`;
+const getCities = async (req, res) => {
+  try {
+    let { name = "" } = req.query;
+    let sqlRequest =
+      "SELECT name, description, department, visited, date FROM city";
 
-  //   const { name } = req.query;
-  //   if (name) {
-  //     sqlRequest += `WHERE name=?`;
-  //   }
+    if (name) {
+      name = `${name}%`;
+      sqlRequest =
+        "SELECT name, description, department, visited, date FROM city WHERE name LIKE ?";
+    }
 
-  connection.query(sqlRequest, (err, results) => {
-    if (err) {
-      res.status(500).send("Error while reading cities");
-      console.log(err.sql);
-      console.log(err.message);
-      return;
+    // get all cities or search by name
+
+    const [data] = await connection.query(sqlRequest, [name]);
+    if (data.length === 0) {
+      return res.status(400).send("Find nothing");
     }
-    if (results.length === 0) {
-      res.status(400).send("Find nothing");
-      return;
-    }
-    res.status(200).send(results);
-  });
+    return res.status(200).send(data);
+  } catch (e) {
+    res.status(500).send("Error while reading cities");
+    console.log(err.sql);
+    console.log(err.message);
+    return;
+  }
 };
 
 module.exports = { getCities };
-
-// GET name
-// app.get("/api/cities/names", (req, res) => {
-//   connection.query("SELECT name from city", (err, results) => {
-//     if (err) {
-//       console.log(err);
-//       res.status(500).send("Erreur lors de la récupération des données");
-//     } else {
-//       res.json(results);
-//     }
-//   });
-// });
 
 // GET with filter 1
 // app.get("/api/cities/contain", (req, res) => {
