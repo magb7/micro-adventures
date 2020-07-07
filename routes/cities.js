@@ -6,9 +6,6 @@ const citiesController = require("../controllers/cities");
 // Get all cities
 router.get("/", citiesController.getCities);
 
-// Get cities name
-// router.get("/names", citiesController.getCitiesName);
-
 // Create new city
 // router.post("/", citiesController.createCity);
 
