@@ -1,11 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const port = 5000;
 const cities = require("./routes/cities");
 
 // Config
 app.use(express.json());
+app.use(cors());
 app.use(
   express.urlencoded({
     extended: true,
