@@ -7,7 +7,7 @@ const citiesController = require("../controllers/cities");
 router.get("/", citiesController.getCities);
 
 // Create new city
-// router.post("/", citiesController.createCity);
+router.post("/", citiesController.createCity);
 
 // Update city
 // router.put("/:id", citiesController.updateCity);
