@@ -4,6 +4,7 @@ const app = express();
 const cors = require("cors");
 const port = 5000;
 const cities = require("./routes/cities");
+const auth = require("./routes/auth");
 
 // Config
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(
 // Router
 app.use("/cities", cities);
 // app.use("/users", users);
+app.use("/auth", auth);
 
 app.listen(port, (err) => {
   if (err) {
