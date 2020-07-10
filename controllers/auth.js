@@ -1,6 +1,8 @@
 const { connection, tokenSecret } = require("../conf");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const passport = require("passport");
+require("../passport/passport-strategies");
 
 const createUser = (req, res) => {
   // Password encryption
@@ -31,6 +33,25 @@ const createUser = (req, res) => {
   });
 };
 
-const connectUser = (req, res) => {};
+const connectUser = (req, res) => {
+  passport.authenticate("local", { session: false }, (err, user, msg) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    // if the user does not exist
+    if (!user) {
+      console.log(msg.msg);
+      return res.sendStatus(500);
+    }
+    // Recreate the token
+    const token = jwt.sign(user, `${tokenSecret}`);
+
+    return res.status(200).send({
+      user,
+      token,
+    });
+  })(req, res);
+};
 
 module.exports = { createUser, connectUser };
