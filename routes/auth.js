@@ -5,5 +5,6 @@ const authController = require("../controllers/auth");
 
 // Create new city
 router.post("/signup", authController.createUser);
+router.post("/signin", authController.connectUser);
 
 module.exports = router;
