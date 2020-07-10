@@ -25,7 +25,7 @@ const createUser = (req, res) => {
     // Creation of the token
     const token = jwt.sign(user, `${tokenSecret}`);
 
-    // Sending back to the user the token and minot information
+    // Sending back to the user the token and minor information
     return res.status(200).send({
       user,
       token,
