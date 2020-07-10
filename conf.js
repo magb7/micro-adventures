@@ -1,5 +1,11 @@
 const mysql = require("mysql2");
-const { DB_USER, DB_PASSWORD, DB_DATABASE, DB_HOST } = process.env;
+const {
+  DB_USER,
+  DB_PASSWORD,
+  DB_DATABASE,
+  DB_HOST,
+  TOKEN_SECRET,
+} = process.env;
 
 const connection = mysql.createPool({
   host: DB_HOST,
@@ -8,4 +14,6 @@ const connection = mysql.createPool({
   database: DB_DATABASE,
 });
 
-module.exports = { connection };
+const tokenSecret = TOKEN_SECRET;
+
+module.exports = { connection, tokenSecret };
