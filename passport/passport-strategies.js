@@ -9,35 +9,41 @@ passport.use(
       usernameField: "email",
       passwordField: "password",
     },
-    (formMail, formPass, done) => {
-      connection.query(
-        "SELECT id, email, password FROM user WHERE email=?",
-        [formMail],
-        (err, res) => {
-          if (err) {
-            console.log(err.sql);
-            console.error(err.message);
-            return done(err);
-          }
-          if (!res.length) {
-            return done(null, false, {
-              msg: "Incorrect user!",
-            });
-          }
-          // Get user information
-          const user = res[0];
-          // Compare password
-          const isPasswordOk = bcrypt.compareSync(formPass, user.password);
+    async (formMail, formPass, done) => {
+      let user;
 
-          // handle error
-          if (!isPasswordOk) {
-            return done(null, false, {
-              msg: "Incorrect password !",
-            });
-          }
-          return done(null, { ...user });
+      try {
+        const [
+          res,
+        ] = await connection.query(
+          "SELECT id, email, password FROM user WHERE email=?",
+          [formMail]
+        );
+
+        if (!res.length) {
+          return done(null, false, {
+            msg: "Incorrect user!",
+          });
         }
-      );
+
+        // Get user information
+        user = res[0];
+
+        // Compare password
+        const isPasswordOk = bcrypt.compareSync(formPass, user.password);
+
+        // handle error
+        if (!isPasswordOk) {
+          return done(null, false, {
+            msg: "Incorrect password !",
+          });
+        }
+      } catch (err) {
+        console.log(err.sql);
+        console.error(err.message);
+        return done(err);
+      }
+      return done(null, { ...user });
     }
   )
 );
