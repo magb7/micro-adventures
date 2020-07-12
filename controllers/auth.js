@@ -4,17 +4,15 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 require("../passport/passport-strategies");
 
-const createUser = (req, res) => {
-  // Password encryption
-  req.body.password = bcrypt.hashSync(req.body.password, 8);
+const createUser = async (req, res) => {
+  try {
+    // Password encryption
+    req.body.password = bcrypt.hashSync(req.body.password, 8);
 
-  // Insertion in database
-  connection.query("INSERT INTO user SET ?", [req.body], (errReq, resReq) => {
-    if (errReq) {
-      console.log(errReq.sql);
-      console.log(errReq.message);
-      return res.status(500).send("Error while creating user");
-    }
+    // Insertion in database
+    const [resReq] = await connection.query("INSERT INTO user SET ?", [
+      req.body,
+    ]);
 
     // Creation of a user to make token
     const user = {
@@ -30,7 +28,12 @@ const createUser = (req, res) => {
       user,
       token,
     });
-  });
+  } catch (err) {
+    res.status(500).send("Error while creating user");
+    console.log(err.sql);
+    console.log(err.message);
+    return;
+  }
 };
 
 const connectUser = (req, res) => {
@@ -39,7 +42,7 @@ const connectUser = (req, res) => {
       console.log(err);
       return res.sendStatus(500);
     }
-    // if the user does not exist
+    // if the user does not exist or the password is wrong
     if (!user) {
       console.log(msg.msg);
       return res.sendStatus(500);
